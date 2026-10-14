@@ -12,36 +12,40 @@ SUBMISSION_FOLDER = ACTIVITY_DIR / "submission"
 
 # La carpeta input/ debe existir y estar vacia.
 # -----------------------------------------------------------------------------
+def clear_folder(folder_path):
+    if os.path.exists(folder_path):
+        for file in glob.glob(f"{folder_path}/*"):
+            os.remove(file)
 
-if os.path.exists(INPUT_FOLDER):
-    for file in glob.glob(f"{INPUT_FOLDER}/*"):
-        os.remove(file)
-else:
-    os.makedirs(INPUT_FOLDER)
+def initialize_folder(folder_path):
+    if os.path.exists(folder_path):
+        clear_folder(folder_path)
+    else:
+        os.makedirs(folder_path)
 
+initialize_folder(INPUT_FOLDER)
 
 # Genera copias de los archivos en raw/
 # -----------------------------------------------------------------------------
 
-n = 1000
+def generate_file_copies(n):
+    for file in glob.glob(f"{DATA_FOLDER}/*"):
 
-for file in glob.glob(f"{DATA_FOLDER}/*"):
+        with open(file, "r", encoding="utf-8") as f:
+            text = f.read()
 
-    with open(file, "r", encoding="utf-8") as f:
-        text = f.read()
+        for i in range(1, n + 1):
 
-    for i in range(1, n + 1):
+            raw_filename_with_extension = os.path.basename(file)
 
-        raw_filename_with_extension = os.path.basename(file)
+            raw_filename_without_extension = os.path.splitext(raw_filename_with_extension)[
+                0
+            ]
 
-        raw_filename_without_extension = os.path.splitext(raw_filename_with_extension)[
-            0
-        ]
+            new_filename = f"{raw_filename_without_extension}_{i:05d}.txt"
 
-        new_filename = f"{raw_filename_without_extension}_{i:05d}.txt"
-
-        with open(f"{INPUT_FOLDER}/{new_filename}", "w", encoding="utf-8") as f2:
-            f2.write(text)
+            with open(f"{INPUT_FOLDER}/{new_filename}", "w", encoding="utf-8") as f2:
+                f2.write(text)
 
 
 # Lectura de los archivos
@@ -89,12 +93,9 @@ for key, value in pairs_sequence:
 # La carpeta de salida debe estar vacia
 # -----------------------------------------------------------------------------
 
-if os.path.exists(OUTPUT_FOLDER):
-    for file in glob.glob(f"{OUTPUT_FOLDER}/*"):
-        os.remove(file)
-else:
-    os.makedirs(OUTPUT_FOLDER)
-
+initialize_folder(OUTPUT_FOLDER)
+n = 1000
+generate_file_copies(n)
 
 # Archivo con el conteo
 # -----------------------------------------------------------------------------
